@@ -1,11 +1,15 @@
-const express = require('express');
-const router = express.Router();
 
- router.get("/", (req , res) => {
-    res.json({ msg: "hello world"});
+const router = require("express").Router();
+const blogRouter = require("../modules/blogs/blog.route");
+const userRoute = require("../modules/users/user.route");
 
- });
- router.post("/", (req , res) => {
-    res.json({ msg: "hello world"});
- });
+  router.use("/api/v1/blogs" , blogRouter);
+//   router.use("api/v1/blogs" , blogUser);
+
+
  module.exports = router;
+
+
+
+
+
