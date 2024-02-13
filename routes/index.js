@@ -1,10 +1,10 @@
 
 const router = require("express").Router();
 const blogRouter = require("../modules/blogs/blog.route");
-const userRoute = require("../modules/users/user.route");
+const userRouter = require("../modules/users/user.route");
 
   router.use("/api/v1/blogs" , blogRouter);
-//   router.use("api/v1/blogs" , blogUser);
+  router.use("/api/v1/users" , userRouter);
 
 
  module.exports = router;
