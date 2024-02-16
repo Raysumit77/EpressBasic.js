@@ -12,6 +12,10 @@ app.use(morgan("dev"));
 app.use(express.json());
 app.use("/assets", express.static("public"));
 
+// app.use(req,res,next) => {
+// res.body.country = "nepal";
+// next();
+// }
 app.use("/", indexRouter);
 
 app.use((err, req, res, next) => {
