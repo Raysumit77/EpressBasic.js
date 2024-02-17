@@ -1,12 +1,16 @@
 require("dotenv").config();
 
 const express = require("express");
+const mongoose = require("mongoose");
 const morgan = require("morgan");
 
 const indexRouter = require("./routes");
 const PORT = Number(process.env.PORT);
 
 const app = express();
+mongoose.connect("mongodb://localhost:27017/blog-app-530").then(() => {
+  console.log("database connected");
+});
 
 app.use(morgan("dev"));
 app.use(express.json());

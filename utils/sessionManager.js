@@ -1,10 +1,10 @@
 const checkRole = (sysRole) => {
-  return (req,res,next) => {
-    const userRole = [req.headers.role] ||[];
-    const isValidRole = sysRole.some((role)  => userRole.includes(role));
-    if(!isValidRole) throw new Error("permission denied! !");
+  return (req, res, next) => {
+    const userRole = [req.headers.role] || [];
+    const isValidRole = sysRole.some((role) => userRole.includes(role));
+    if (!isValidRole) throw new Error("permission denied!!");
+    next();
   };
- 
 };
 
 //RBAC(ROLE base acces control)

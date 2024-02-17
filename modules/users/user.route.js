@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const { validate } = require("./user.validate");
 const { checkRole } = require("../../utils/sessionManager");
+const userController = require("./user.controller");
 
 // //get all the users
 router.get("/", (req, res, next) => {
@@ -14,11 +15,12 @@ router.get("/", (req, res, next) => {
 });
 
 //add new user
-router.post("/", checkRole(["admmin"]), validate, (req, res, next) => {
+router.post("/", checkRole(["admin"]), validate, async (req, res, next) => {
   try {
-    console.log(req.body);
-    //database operation
-    res.json({ msg: "hello from user Route" });
+    // console.log(req.body);
+    // res.json({ msg: "hello from user Route " });
+     const result = await userController.create(req.body);
+      res.json({ data: result });
   } catch (err) {
     next(err);
   }
