@@ -19,8 +19,8 @@ router.post("/", checkRole(["admin"]), validate, async (req, res, next) => {
   try {
     // console.log(req.body);
     // res.json({ msg: "hello from user Route " });
-     const result = await userController.create(req.body);
-      res.json({ data: result });
+    const result = await userController.create(req.body);
+    res.json({ data: result });
   } catch (err) {
     next(err);
   }
