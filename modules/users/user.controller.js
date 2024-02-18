@@ -2,28 +2,27 @@ const userModel = require("./user.model");
 
 //create
 const create = (payload) => {
-    return userModel.create(payload);
+  return userModel.create(payload);
 };
- 
-//read part1 
-const list = () =>{
-    return userModel.find();
+
+//read part1
+const list = () => {
+  return userModel.find();
 };
 
 //read part 2
-const geTById = (_Id) =>{
-return userModel.findOne({_Id});
+const getById = (_id) => {
+  return userModel.findOne({ _id });
 };
 
 //update
-const updateById = (_Id , payload) => {
-    return userModel.updateByOne({_Id} , payload);
+const updateById = (_id, payload) => {
+  return userModel.updateOne({ _id }, payload);
 };
 
 //delete
-const removeById = (_Id) => {
-    return userModel.deleteOne({ _Id});
+const removeById = (_id) => {
+  return userModel.deleteOne({ _id });
 };
 
-
-module.exports = { create, list,geTById,updateById,removeById };
+module.exports = { create, list, getById, updateById, removeById };

@@ -4,11 +4,24 @@ const { checkRole } = require("../../utils/sessionManager");
 const userController = require("./user.controller");
 
 // //get all the users
-router.get("/", (req, res, next) => {
+router.get("/", async (req, res, next) => {
   try {
     const { limit, page, search } = req.query; //used for search
     //database operation
-    res.json({ msg: "hello from user Route" });
+    const result = await userController.list();
+    res.json({data:result });
+  } catch (err) {
+    next(err);
+  }
+});
+
+
+// //get one users
+router.get("/:Id", async (req, res, next) => {
+  try {
+    //database operation
+    const result = await userController.getById(req.params.id);
+    res.json({data:result });
   } catch (err) {
     next(err);
   }
@@ -26,36 +39,32 @@ router.post("/", checkRole(["admin"]), validate, async (req, res, next) => {
   }
 });
 //update single usee for more than 2 fields
-router.put("/:id", (req, res, next) => {
+router.put("/:id", async(req, res, next) => {
   try {
-    const { id } = req.params;
-    const data = req.body;
-    console.log({ id, data });
     //database operation
-    res.json({ msg: `hello from user Route id ${id}` });
+    const result = await userController.updateById(req.params.id,req.body);
+    res.json({ data: result});
   } catch (err) {
     next(err);
   }
 });
 
 //update single user for single field
-router.patch("/:id", (req, res, next) => {
+router.patch("/:id", async(req, res, next) => {
   try {
-    const { id } = req.params;
-    const data = req.body;
-    console.log({ id, data });
     //database operation
-    res.json({ mssg: "hello from user patch route" });
+    const result = await userController.updateById(req.params.id,req.body);
+    res.json({ data: result});
   } catch (err) {
     next(err);
   }
 });
 
 //delete single user
-router.delete("/:id", (req, res, next) => {
+router.delete("/:id", async (req, res, next) => {
   try {
-    console.log(req.params.id);
-    res.json({ msg: "hello from user Route" });
+   const result = await userController.removeById(req.params.id,);
+    res.json({ data:result});
   } catch (err) {
     next(err);
   }
