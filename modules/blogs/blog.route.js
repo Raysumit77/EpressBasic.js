@@ -44,7 +44,7 @@ router.patch("/:id", (req, res, next) => {
     console.log({ id, data });
     //database operation
     res.json({ msg: "hello from user Route" });
-  } catch (error) {
+  } catch (err) {
     next(err);
   }
 });
@@ -54,7 +54,7 @@ router.delete("/:id", (req, res, next) => {
   try {
     console.log(req.param.id);
     res.json({ msg: "hello from user Route" });
-  } catch (error) {
+  } catch (err) {
     next(err);
   }
 });

@@ -5,28 +5,27 @@ const blogSchema = new Schema({
         type: String,
         required: true
     },
-    content: {
-        type: String,
-        required: true
-    },
-    author: {
-        type: String,
-        required: true
-    },
     slug: {
         type: String,
         required: true,
         unique: true // Ensures slugs are unique
     },
-    createdAt: {
-        type: Date,
-        default: Date.now
+    author: {
+        type: String,
+        required: true
     },
-    updatedAt: {
-        type: Date,
-        default: Date.now
-    }
-   
+    status: {
+        type: String,
+        enum:["draft", "published"],
+        default:"draft",
+        required:true
+    },
+    content: {
+        type: String,
+        required: true
+    },
+pictureUrl:{ type :String},
+duration:{ type: Number , min: 1},
 });
     
 module.exports = new model("blog" ,blogSchema);
