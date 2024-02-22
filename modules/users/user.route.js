@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const { validate } = require("./user.validate");
+const { Login, validate } = require("./user.validate");
 const { checkRole } = require("../../utils/sessionManager");
 const userController = require("./user.controller");
 
@@ -27,7 +27,7 @@ router.get("/:Id", async (req, res, next) => {
 });
 
 // /add new user
-router.post("/", validate, async (req, res, next) => {
+router.post("/", checkRole(["admin"]), validate, async (req, res, next) => {
   try {
     // console.log(req.body);
     // res.json({ msg: "hello from user Route " });
@@ -75,6 +75,17 @@ router.post("/register", validate, async (req, res, next) => {
     // console.log(req.body);
     // res.json({ msg: "hello from user Route " });
     const result = await userController.register(req.body);
+    res.json({ data: result });
+  } catch (err) {
+    next(err);
+  }
+});
+//REGISTER USER
+router.post("/Login", Login, async (req, res, next) => {
+  try {
+    // console.log(req.body);
+    // res.json({ msg: "hello from user Route " });
+    const result = await userController.Login(req.body);
     res.json({ data: result });
   } catch (err) {
     next(err);

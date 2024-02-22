@@ -1,7 +1,7 @@
 const userModel = require("./user.model");
 const { mail } = require("../../services/nodemailer");
-const { hashPassword } = require("../../utils/bcrypt");
-
+const { hashPassword, comparePassword } = require("../../utils/bcrypt");
+const { generateToken} = require("../../utils/token");
 //create
 const create = (payload) => {
   return userModel.create(payload);
@@ -40,4 +40,22 @@ const register = async (payload) => {
   );
 };
 
-module.exports = { create, list, getById, updateById, removeById, register };
+//login
+const Login = async (payload) => {
+  const { email, password } = payload;
+  if (!email || !password) throw new Error("Email or password is missing");
+  const user = await userModel.findOne({ email });
+  if (!user) throw new Error("user doesn't exists");
+  const isValidPw = comparePassword(password, user.password);
+const tokenData = { name: user.name,email: user.email,role:user.roles};
+ return generateToken(tokenData);
+};
+module.exports = {
+  create,
+  list,
+  getById,
+  updateById,
+  removeById,
+  register,
+  Login,
+};
