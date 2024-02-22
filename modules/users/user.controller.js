@@ -41,13 +41,13 @@ const register = async (payload) => {
 };
 
 //login
-const Login = async (payload) => {
+const login = async (payload) => {
   const { email, password } = payload;
   if (!email || !password) throw new Error("Email or password is missing");
   const user = await userModel.findOne({ email });
   if (!user) throw new Error("user doesn't exists");
   const isValidPw = comparePassword(password, user.password);
-const tokenData = { name: user.name,email: user.email,role:user.roles};
+const tokenData = { name: user.name,email: user.email};
  return generateToken(tokenData);
 };
 module.exports = {
@@ -57,5 +57,5 @@ module.exports = {
   updateById,
   removeById,
   register,
-  Login,
+  login,
 };

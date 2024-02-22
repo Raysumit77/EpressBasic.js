@@ -9,6 +9,7 @@ const Schema = Joi.object({
     .required(),
   name: Joi.string().min(3).max(50).required(),
   password: Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")).required(),
+  roles: Joi.array().items(Joi.string().valid("admin", "user")),
   // isActive: Joi.boolean().strict(),
   // isBlocked: Joi.boolean().strict(),
   // role: [Joi.string(), Joi.number()],
