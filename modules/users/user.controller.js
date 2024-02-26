@@ -47,9 +47,8 @@ const login = async (payload) => {
   const user = await userModel.findOne({ email });
   if (!user) throw new Error("user doesn't exists");
   const isValidPw = comparePassword(password, user.password);
-  if (!isValidPw) throw new Error("Email or password mismatch");
-  const tokenData = { name: user.name, email: user.email };
-  return generateToken(tokenData);
+const tokenData = { name: user.name,email: user.email,role:user.roles};
+ return generateToken(tokenData);
 };
 
 const generateFPToken = async (payload) => {
@@ -143,12 +142,5 @@ module.exports = {
   updateById,
   removeById,
   register,
-  login,
-  verifyFPToken,
-  generateFPToken,
-  changePassword,
-  resetPassword,
-  blockUser,
-  getProfile,
-  updateProfile,
+  Login,
 };

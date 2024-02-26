@@ -158,6 +158,26 @@ router.delete("/:id", async (req, res, next) => {
   }
 });
 
-
-
+//REGISTER USER
+router.post("/register", validate, async (req, res, next) => {
+  try {
+    // console.log(req.body);
+    // res.json({ msg: "hello from user Route " });
+    const result = await userController.register(req.body);
+    res.json({ data: result });
+  } catch (err) {
+    next(err);
+  }
+});
+//REGISTER USER
+router.post("/Login", Login, async (req, res, next) => {
+  try {
+    // console.log(req.body);
+    // res.json({ msg: "hello from user Route " });
+    const result = await userController.Login(req.body);
+    res.json({ data: result });
+  } catch (err) {
+    next(err);
+  }
+});
 module.exports = router;
