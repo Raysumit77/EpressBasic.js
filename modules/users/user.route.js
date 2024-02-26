@@ -80,12 +80,12 @@ router.post("/register", validate, async (req, res, next) => {
     next(err);
   }
 });
-//REGISTER USER
-router.post("/Login", Login, async (req, res, next) => {
+//LOGIN 
+router.post("/login", Login, async (req, res, next) => {
   try {
     // console.log(req.body);
     // res.json({ msg: "hello from user Route " });
-    const result = await userController.Login(req.body);
+    const result = await userController.login(req.body);
     res.json({ data: result });
   } catch (err) {
     next(err);

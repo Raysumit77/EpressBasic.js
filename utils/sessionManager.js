@@ -1,14 +1,26 @@
+const { verifyToken } = require("./token");
+const userModel = require("../modules/users/user.model");
+
 const checkRole = (sysRole) => {
-  return (req, res, next) => {
-    const userRole = [req.headers.role] || [];
-    const isValidRole = sysRole.some((role) => userRole.includes(role));
-    if (!isValidRole) throw new Error("permission denied!!");
-    next();
+  return async (req, res, next) => {
+    try {
+      const token = req.headers.access_token || null;
+      if (!token) throw new Error("Token missing");
+      const { data } = verifyToken(token);
+      //check if user is active or not
+      const user = await userModel.findone({
+        email: data.email,
+        isActive: true,
+      });
+      if (!user) throw new Error("Invalid Token");
+      //compare Role
+      const isValidRole = sysRole.some((role) => user.roles.includes(role));
+      if (!isvalidRole) throw new Error("Permission denied");
+      next();
+    } catch (e) {
+      next(e);
+    }
   };
 };
-
-//RBAC(ROLE base acces control)
-//ABAC(attribute)
-//PBAC(permisssion)
 
 module.exports = { checkRole };
