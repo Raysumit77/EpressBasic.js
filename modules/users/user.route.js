@@ -3,7 +3,7 @@ const { Login, validate } = require("./user.validate");
 const { checkRole } = require("../../utils/sessionManager");
 const userController = require("./user.controller");
 
-// //get all the users
+ //get all the users
 router.get("/", async (req, res, next) => {
   try {
     const { limit, page, search } = req.query; //used for search
@@ -30,39 +30,8 @@ router.get("/:Id", async (req, res, next) => {
 router.post("/", checkRole(["admin"]), validate, async (req, res, next) => {
   try {
     // console.log(req.body);
-    // res.json({ msg: "hello from user Route " });
+
     const result = await userController.create(req.body);
-    res.json({ data: result });
-  } catch (err) {
-    next(err);
-  }
-});
-//update single usee for more than 2 fields
-router.put("/:id", async (req, res, next) => {
-  try {
-    //database operation
-    const result = await userController.updateById(req.params.id, req.body);
-    res.json({ data: result });
-  } catch (err) {
-    next(err);
-  }
-});
-
-//update single user for single field
-router.patch("/:id", async (req, res, next) => {
-  try {
-    //database operation
-    const result = await userController.updateById(req.params.id, req.body);
-    res.json({ data: result });
-  } catch (err) {
-    next(err);
-  }
-});
-
-//delete single user
-router.delete("/:id", async (req, res, next) => {
-  try {
-    const result = await userController.removeById(req.params.id);
     res.json({ data: result });
   } catch (err) {
     next(err);
@@ -80,8 +49,9 @@ router.post("/register", validate, async (req, res, next) => {
     next(err);
   }
 });
-//LOGIN 
-router.post("/login", Login, async (req, res, next) => {
+
+//LOGIN
+router.post("/login", validate, async (req, res, next) => {
   try {
     // console.log(req.body);
     // res.json({ msg: "hello from user Route " });
@@ -91,4 +61,103 @@ router.post("/login", Login, async (req, res, next) => {
     next(err);
   }
 });
+//generate token
+router.post("/generate-fp-token", async (req, res, next) => {
+  try {
+
+    const result = await userController.generateFPToken(req.body);
+    res.json({ data: result });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post("/verify-fp-token", async (req, res, next) => {
+  try {
+   
+    const result = await userController.verifyFPToken(req.body);
+    res.json({ data: result });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post(
+  "/change-password",
+  checkRole(["user", "admin"]),
+  async (req, res, next) => {
+    try {
+      
+      const result = await userController.changePassword(req.body);
+      res.json({ data: result });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+router.post("/reset-password", checkRole(["admin"]), async (req, res, next) => {
+  try {
+    const result = await userController.resetPassword(req.body);
+    res.json({ data: result });
+  } catch (e) {
+    next(e);
+  }
+});
+
+router.patch("/block-user", checkRole(["admin"]), async (req, res, next) => {
+  try {
+    const result = await userController.blockUser(req.body);
+    res.json({ data: result });
+  } catch (e) {
+    next(e);
+  }
+});
+
+//GET MY PROFILE
+router.get("/get-profile", checkRole(["admin","user"]),async (req, res, next) => {
+  try {
+    const result = await userController.getProfile(req.currentUser);
+    res.json({ data: result });
+  } catch (err) {
+    next(err);
+  }
+});
+
+//update single user for single field
+router.patch("/:id", async (req, res, next) => {
+  try {
+    //database operation
+    const result = await userController.updateById(req.params.id, req.body);
+    res.json({ data: result });
+  } catch (err) {
+    next(err);
+  }
+});
+
+//update single usee for more than 2 fields
+router.put("/:id", async (req, res, next) => {
+  try {
+    //database operation
+    const result = await userController.updateById(req.params.id, req.body);
+    res.json({ data: result });
+  } catch (err) {
+    next(err);
+  }
+});
+
+
+
+//delete single user
+router.delete("/:id", async (req, res, next) => {
+  try {
+    const result = await userController.removeById(req.params.id);
+    res.json({ data: result });
+  } catch (err) {
+    next(err);
+  }
+});
+
+
+
 module.exports = router;

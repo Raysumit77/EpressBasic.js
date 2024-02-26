@@ -7,8 +7,8 @@ const checkRole = (sysRole) => {
       const token = req.headers.access_token || null;
       if (!token) throw new Error("Token missing");
       const { data } = verifyToken(token);
-      //check if user is active or not
-      const user = await userModel.findone({
+      // check if user is active or not
+      const user = await userModel.findOne({
         email: data.email,
         isActive: true,
       });
@@ -16,6 +16,7 @@ const checkRole = (sysRole) => {
       //compare Role
       const isValidRole = sysRole.some((role) => user.roles.includes(role));
       if (!isvalidRole) throw new Error("Permission denied");
+      req.currentUser = user?._id;
       next();
     } catch (e) {
       next(e);
