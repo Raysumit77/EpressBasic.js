@@ -47,6 +47,7 @@ const login = async (payload) => {
   const user = await userModel.findOne({ email, isActive: true });
   if (!user) throw new Error("user doesn't exists");
   const isValidPw = comparePassword(password, user.password);
+  if (!isValidPw) throw new Error("Email or Password doesn't match");
   const tokenData = { name: user.name, email: user.email, role: user.roles };
   return generateToken(tokenData);
 };

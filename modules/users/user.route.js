@@ -1,25 +1,35 @@
 const router = require("express").Router();
+const multer = require("multer");
 const { Login, validate } = require("./user.validate");
 const { checkRole } = require("../../utils/sessionManager");
 const userController = require("./user.controller");
 
- //get all the users
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "./public/image/users");
+  },
+  filename: function (req, file, cb) {
+    const imageName = "image".concat(
+      "-",
+      Date.now(),
+      ".",
+      file.originalname.split(".")[file.originalname.split(".").length - 1]
+    );
+    cb(null, imageName);
+  },
+});
+
+//hw file size each max1mb
+//hw file type png, jpeg, jpg
+
+const upload = multer({ storage: storage });
+
+//get all the users
 router.get("/", async (req, res, next) => {
   try {
     const { limit, page, search } = req.query; //used for search
     //database operation
     const result = await userController.list();
-    res.json({ data: result });
-  } catch (err) {
-    next(err);
-  }
-});
-
-// //get one users
-router.get("/:Id", async (req, res, next) => {
-  try {
-    //database operation
-    const result = await userController.getById(req.params.id);
     res.json({ data: result });
   } catch (err) {
     next(err);
@@ -39,19 +49,25 @@ router.post("/", checkRole(["admin"]), validate, async (req, res, next) => {
 });
 
 //REGISTER USER
-router.post("/register", validate, async (req, res, next) => {
-  try {
-    // console.log(req.body);
-    // res.json({ msg: "hello from user Route " });
-    const result = await userController.register(req.body);
-    res.json({ data: result });
-  } catch (err) {
-    next(err);
+router.post(
+  "/register",
+  upload.single("pictureUrl"),
+  validate,
+  async (req, res, next) => {
+    try {
+      if (req.file) {
+        req.body.pictureUrl = req.file.path.replace("public", "");
+      }
+      const result = await userController.register(req.body);
+      res.json({ data: result });
+    } catch (err) {
+      next(err);
+    }
   }
-});
+);
 
 //LOGIN
-router.post("/login", validate, async (req, res, next) => {
+router.post("/login", Login, async (req, res, next) => {
   try {
     // console.log(req.body);
     // res.json({ msg: "hello from user Route " });
@@ -64,7 +80,6 @@ router.post("/login", validate, async (req, res, next) => {
 //generate token
 router.post("/generate-fp-token", async (req, res, next) => {
   try {
-
     const result = await userController.generateFPToken(req.body);
     res.json({ data: result });
   } catch (err) {
@@ -74,7 +89,6 @@ router.post("/generate-fp-token", async (req, res, next) => {
 
 router.post("/verify-fp-token", async (req, res, next) => {
   try {
-   
     const result = await userController.verifyFPToken(req.body);
     res.json({ data: result });
   } catch (err) {
@@ -87,7 +101,6 @@ router.post(
   checkRole(["user", "admin"]),
   async (req, res, next) => {
     try {
-      
       const result = await userController.changePassword(req.body);
       res.json({ data: result });
     } catch (err) {
@@ -115,9 +128,24 @@ router.patch("/block-user", checkRole(["admin"]), async (req, res, next) => {
 });
 
 //GET MY PROFILE
-router.get("/get-profile", checkRole(["admin","user"]),async (req, res, next) => {
+router.get(
+  "/get-profile",
+  checkRole(["admin", "user"]),
+  async (req, res, next) => {
+    try {
+      const result = await userController.getProfile(req.currentUser);
+      res.json({ data: result });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+// //get one users
+router.get("/:Id", async (req, res, next) => {
   try {
-    const result = await userController.getProfile(req.currentUser);
+    //database operation
+    const result = await userController.getById(req.params.id);
     res.json({ data: result });
   } catch (err) {
     next(err);
@@ -146,35 +174,10 @@ router.put("/:id", async (req, res, next) => {
   }
 });
 
-
-
 //delete single user
 router.delete("/:id", async (req, res, next) => {
   try {
     const result = await userController.removeById(req.params.id);
-    res.json({ data: result });
-  } catch (err) {
-    next(err);
-  }
-});
-
-//REGISTER USER
-router.post("/register", validate, async (req, res, next) => {
-  try {
-    // console.log(req.body);
-    // res.json({ msg: "hello from user Route " });
-    const result = await userController.register(req.body);
-    res.json({ data: result });
-  } catch (err) {
-    next(err);
-  }
-});
-//REGISTER USER
-router.post("/Login", Login, async (req, res, next) => {
-  try {
-    // console.log(req.body);
-    // res.json({ msg: "hello from user Route " });
-    const result = await userController.Login(req.body);
     res.json({ data: result });
   } catch (err) {
     next(err);
