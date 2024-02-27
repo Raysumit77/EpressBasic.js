@@ -44,7 +44,7 @@ const register = async (payload) => {
 const login = async (payload) => {
   const { email, password } = payload;
   if (!email || !password) throw new Error("Email or password is missing");
-  const user = await userModel.findOne({ email });
+  const user = await userModel.findOne({ email, isActive: true });
   if (!user) throw new Error("user doesn't exists");
   const isValidPw = comparePassword(password, user.password);
   const tokenData = { name: user.name, email: user.email, role: user.roles };
