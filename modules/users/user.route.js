@@ -19,10 +19,21 @@ const storage = multer.diskStorage({
   },
 });
 
-//hw file size each max1mb
-//hw file type png, jpeg, jpg
-
-const upload = multer({ storage: storage });
+//hw file size each max 1mb
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 1000000 },
+  //hw file type png, jpeg, jpg
+  fileFilter: (req, file, cb) => {
+    // Check file type
+    const allowedTypes = ["image/png", "image/jpeg", "image/jpg"];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only PNG, JPEG, and JPG files are allowed"));
+    }
+  },
+});
 
 //get all the users
 router.get("/", async (req, res, next) => {
@@ -134,6 +145,20 @@ router.get(
   async (req, res, next) => {
     try {
       const result = await userController.getProfile(req.currentUser);
+      res.json({ data: result });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+//UPDATE MY PROFILE
+router.get(
+  "/update-profile",
+  checkRole(["admin", "user"]),
+  async (req, res, next) => {
+    try {
+      const result = await userController.updateProfile(req.currentUser);
       res.json({ data: result });
     } catch (err) {
       next(err);

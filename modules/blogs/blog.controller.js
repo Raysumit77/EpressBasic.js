@@ -1,32 +1,45 @@
 const blogModel = require("./blog.model");
-
-
+const { generateSlug } = require("../../utils/textParser");
 
 //create
 const create = (payload) => {
-    return blogModel.craete(payload);
+  payload.slug = generateSlug(payload.title);
+  return blogModel.create(payload);
 };
 
-//read part1
 const list = () => {
-    return userModel.find();
-  };
-  
-  //read part 2
-  const getById = (_id) => {
-    return userModel.findOne({ _id });
-  };
-  
-  //update
-  const updateById = (_id, payload) => {
-    return userModel.updateOne({ _id }, payload);
-  };
-  
-  //delete
-  const removeById = (_id) => {
-    return userModel.deleteOne({ _id });
-  };
-  
-  module.exports = { create, list, getById, updateById, removeById };
-  
+  //pagination
+  //objectid
+  //aggregation
+  return blogModel.aggregate([
+    {
+      $lookup: {
+        from: "users",
+        localField: "author",
+        foreignField: "_id",
+        as: "author",
+      },
+    },
+    {
+      $unwind: {
+        path: "$author",
+        preserveNullAndEmptyArrays: false,
+      },
+    },
+    {
+      $project: {
+        author: "$author.name",
+        title: 1,
+        slug: 1,
+        content: 1,
+        status: 1,
+        duration: 1,
+        createdAt: 1,
+        updatedAt: 1,
+        _id: 0,
+      },
+    },
+  ]);
+};
 
+module.exports = { create, list };
