@@ -8,8 +8,59 @@ const create = (payload) => {
 };
 
 //read part1
-const list = () => {
-  return userModel.find();
+const list = async (search, page = 1, limit = 1) => {
+  const query = [];
+  if (search?.name) {
+    query.push({
+      $match: {
+        name: new RegExp("search?.name", "gi"),
+      },
+    });
+  }
+
+  //  if(sort?.name) {
+  //   query.push(
+  //     {
+  //       '$sort': {
+  //         'createdAt': -1
+  //       }
+  //     },
+  //   )
+  //  }
+  query.push(
+    {
+      $facet: {
+        metadata: [
+          {
+            $count: "total",
+          },
+        ],
+        data: [
+          {
+            $skip: (+page - 1) * limit,
+          },
+          {
+            $limit: +limit,
+          },
+        ],
+      },
+    },
+    {
+      $addFields: {
+        total: {
+          $arrayElemAt: ["$metadata.total", 0],
+        },
+      },
+    }
+  );
+
+  const result = await userModel.aggregate(query);
+  return {
+    total: result[0].total || 0,
+    data: result[0].data,
+    page: +page,
+    limit: +limit,
+  };
 };
 
 //read part 2

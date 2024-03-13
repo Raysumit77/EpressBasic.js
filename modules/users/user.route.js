@@ -38,9 +38,10 @@ const upload = multer({
 //get all the users
 router.get("/", async (req, res, next) => {
   try {
-    const { limit, page, search } = req.query; //used for search
+    const { limit, page, name } = req.query; //used for search
+    const search = { name  };
     //database operation
-    const result = await userController.list();
+    const result = await userController.list(search,page,limit);
     res.json({ data: result });
   } catch (err) {
     next(err);
@@ -48,7 +49,7 @@ router.get("/", async (req, res, next) => {
 });
 
 // /add new user
-router.post("/", checkRole(["admin"]), validate, async (req, res, next) => {
+router.post("/",  validate, async (req, res, next) => {
   try {
     // console.log(req.body);
 

@@ -1,62 +1,109 @@
 const router = require("express").Router();
 const { checkRole } = require("../../utils/sessionManager");
-const controller = require("./blog.controller");
+const Controller = require("./blog.controller");
+const { validate } = require("./blog.validate");
 
-//get all the users
+router.post(
+  "/",
+  checkRole(["user", "admin"]),
+  validate,
+  async (req, res, next) => {
+    try {
+      req.body.author = req.body.author || req.currentUser;
+      const result = await Controller.create(req.body);
+      res.json({ data: result });
+    } catch (e) {
+      next(e);
+    }
+  }
+);
+
 router.get("/", async (req, res, next) => {
   try {
-    // const { limit, page, search } = req.query;
-    const result = await controller.list();
+    const { title, author, page, limit } = req.query;
+    const search = { title, author };
+    const result = await Controller.list(search, page, limit);
     res.json({ data: result });
-  } catch (error) {
-    next(err);
+  } catch (e) {
+    next(e);
   }
 });
 
-//add new user
-router.post("/", checkRole(["user", "admin"]), async (req, res, next) => {
+router.get("/my-blogs", checkRole(["user"]), async (req, res, next) => {
   try {
-    req.body.author = req.body.author || req.currentUser;
-    const result = await controller.create(req.body);
+    const { page, limit } = req.query;
+    const result = await Controller.getAuthorBlogs(
+      req.currentUser,
+      page,
+      limit
+    );
     res.json({ data: result });
-  } catch (err) {
-    next(err);
+  } catch (e) {
+    next(e);
   }
 });
-// //update single usee for more than 2 fields
-// router.put("/:id", (req, res, next) => {
-//   try {
-//     const { id } = req.params;
-//     const data = req.body;
-//     console.log({ id, data });
-//     //database operation
-//     res.json({ msg: `hello from user put Route id ${id}` });
-//   } catch (error) {
-//     next(err);
-//   }
-// });
 
-// //update single user for single field
-// router.patch("/:id", (req, res, next) => {
-//   try {
-//     const { id } = req.params;
-//     const data = req.body;
-//     console.log({ id, data });
-//     //database operation
-//     res.json({ msg: "hello from user Route" });
-//   } catch (err) {
-//     next(err);
-//   }
-// });
+router.get("/published-only", async (req, res, next) => {
+  try {
+    const { page, limit, title, author } = req.query;
+    const search = { title, author };
+    const result = await Controller.getPublishedBlogs(search, page, limit);
+    res.json({ data: result });
+  } catch (e) {
+    next(e);
+  }
+});
 
-// //delete single user
-// router.delete("/:id", (req, res, next) => {
-//   try {
-//     console.log(req.param.id);
-//     res.json({ msg: "hello from user Route" });
-//   } catch (err) {
-//     next(err);
-//   }
-//});
+router.get(
+  "/admin/:slug",
+  checkRole(["user", "admin"]),
+  async (req, res, next) => {
+    try {
+      const { slug } = req.params;
+      const payload = { slug, author: req.currentUser, roles: req.roles };
+      const result = await Controller.getById(payload);
+      res.json({ data: result });
+    } catch (e) {
+      next(e);
+    }
+  }
+);
+
+router.get("/:slug", async (req, res, next) => {
+  try {
+    const { slug } = req.params;
+    const payload = { slug, author: req.currentUser };
+    const result = await Controller.getBySlug(payload);
+    res.json({ data: result });
+  } catch (e) {
+    next(e);
+  }
+});
+
+router.put("/:slug", checkRole(["user", "admin"]), async (req, res, next) => {
+  try {
+    const { slug } = req.params;
+    const payload = {
+      slug,
+      author: req.currentUser,
+      roles: req.roles,
+      ...req.body,
+    };
+    const result = await Controller.updateBySlug(payload);
+    res.json({ data: result });
+  } catch (e) {
+    next(e);
+  }
+});
+
+router.patch("/:slug", checkRole(["user", "admin"]), async (req, res, next) => {
+  try {
+    const { slug } = req.params;
+    const result = await Controller.changeStatus(slug);
+    res.json({ data: result });
+  } catch (e) {
+    next(e);
+  }
+});
 
 module.exports = router;

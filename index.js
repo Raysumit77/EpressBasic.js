@@ -1,5 +1,6 @@
 require("dotenv").config();
 
+const cors = require("cors");
 const express = require("express");
 const mongoose = require("mongoose");
 const morgan = require("morgan");
@@ -12,6 +13,7 @@ mongoose.connect(process.env.DB_URL).then(() => {
   console.log("database connected");
 });
 
+app.use(cors());
 app.use(morgan("dev"));
 app.use(express.json());
 app.use("/assets", express.static("public"));
