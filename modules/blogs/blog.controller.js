@@ -16,7 +16,6 @@ const list = async (search, page = 1, limit = 5) => {
       },
     });
   }
-
   // Lookup author
   query.push(
     {
@@ -24,18 +23,19 @@ const list = async (search, page = 1, limit = 5) => {
         from: "users",
         localField: "author",
         foreignField: "_id",
-        as: "author",
+        as: "authorInfo",
       },
     },
     {
       $unwind: {
-        path: "$author",
+        path: "$authorInfo",
         preserveNullAndEmptyArrays: false,
       },
     },
     {
       $project: {
-        author: "$author.name",
+        authorId: "$author",
+        author: "$authorInfo.name",
         title: 1,
         slug: 1,
         content: 1,
@@ -48,6 +48,13 @@ const list = async (search, page = 1, limit = 5) => {
     }
   );
 
+  if (search?.authorId) {
+    query.push({
+      $match: {
+        authorId: search?.authorId,
+      },
+    });
+  }
   if (search?.author) {
     query.push({
       $match: {
@@ -55,7 +62,6 @@ const list = async (search, page = 1, limit = 5) => {
       },
     });
   }
-
   // pagination
   query.push(
     {
@@ -88,6 +94,7 @@ const list = async (search, page = 1, limit = 5) => {
       },
     }
   );
+
   const result = await blogModel.aggregate(query);
 
   return {
@@ -192,6 +199,7 @@ const getPublishedBlogs = async (search, page = 1, limit = 5) => {
         duration: 1,
         createdAt: 1,
         updatedAt: 1,
+        pictureUrl: 1,
         _id: 0,
       },
     },
@@ -247,10 +255,12 @@ const getPublishedBlogs = async (search, page = 1, limit = 5) => {
 };
 
 const getBySlug = async (payload) => {
-  const existingBlog = await blogModel.findOne({
-    slug: payload.slug,
-    status: "published",
-  });
+  const existingBlog = await blogModel
+    .findOne({
+      slug: payload.slug,
+      status: "published",
+    })
+    .populate("author", "name");
   if (!existingBlog) throw new Error("Blog not found");
   return existingBlog;
 };
