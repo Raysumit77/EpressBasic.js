@@ -4,8 +4,8 @@ const data = require("./data");
 const mongoose = require("mongoose");
 const blogController = require("../modules/blogs/blog.controller");
 
-const user1 = "65dee915bafffec2eb0ecca3";
-const user2 = "65dee95ebafffec2eb0ecca6";
+const user1 = "65d886c77871460a760e3760";
+const user2 = "65dc4f9c7fcc28499ab9baa8";
 
 const setup = {
   initialize: async () => {
