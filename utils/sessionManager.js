@@ -5,22 +5,23 @@ const checkRole = (sysRole) => {
   return async (req, res, next) => {
     try {
       const token = req.headers.access_token || null;
-      console.log({ token });
-      if (!token) throw new Error("Token is missing");
+      if (!token) throw new Error("Token missing");
       const { data } = verifyToken(token);
+      // Check if user is active or not
       const user = await userModel.findOne({
         email: data.email,
         isActive: true,
       });
       if (!user) throw new Error("Invalid Token");
+      // Compare Role
       const isValidRole = sysRole.some((role) => user.roles.includes(role));
-      if (!isValidRole) throw new Error("permission denied!!");
+      if (!isValidRole) throw new Error("Permission denied");
       req.currentUser = user?._id;
+      req.roles = user?.roles;
       next();
-    } catch (err) {
-      next(err);
+    } catch (e) {
+      next(e);
     }
   };
 };
-
 module.exports = { checkRole };
