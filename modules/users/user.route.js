@@ -139,7 +139,7 @@ router.get(
 );
 
 // UPDATE MY PROFILE
-router.get(
+router.put(
   "/update-profile",
   checkRole(["admin", "user"]),
   async (req, res, next) => {
